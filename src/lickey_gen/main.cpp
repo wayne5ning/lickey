@@ -106,6 +106,7 @@ int batch_mode(int argc, char* argv[]) {
         const auto* version = feat["version"].GetString();
         const auto numLics = feat["num_lics"].GetInt();
         if (!AddFeature(name, version, issueDate, expireDateStr, numLics, lic, licMgr)) {
+            std::cerr << "Fail to add feature name=" << name << ", version=" << version << ", num_lics=" << numLics << "\n";
             return -1;
         }
     }
@@ -114,6 +115,7 @@ int batch_mode(int argc, char* argv[]) {
 
     if (!licMgr.Save(outFile, lickey::HardwareKey{ mac }, lic)) {
         std::cerr << "Fail to write to file: " << outFile << "\n";
+        return -1;
     }
 
 
