@@ -1,6 +1,8 @@
 #include <algorithm>
 #include <string>
 #include <sstream>
+#include <fstream>
+#include <filesystem>
 #include <boost/algorithm/string.hpp>
 #include <FeatureInfo.h>
 #include <FileUtility.h>
@@ -9,6 +11,10 @@
 #include <License.h>
 #include <LicenseManager.h>
 #include <Version.h>
+
+#include "rapidjson/filereadstream.h"
+#include "rapidjson/document.h"
+
 using namespace lickey;
 
 namespace
@@ -47,7 +53,7 @@ namespace
         licMgr.Add(featureName, version, issue, expire, numLics, lic);
         std::cout << "done to add feature = " << featureName << "\n";
         std::cout << "  version = " << featureVersion << "\n";
-        std::cout << "  issue date = " << ToString(issue) << "\n";
+        std::cout << "  issueDate date = " << ToString(issue) << "\n";
         std::cout << "  expire date = " << expireDate << "\n";
         std::cout << "  num licenses = " << numLics << "\n";
         return true;
@@ -55,8 +61,69 @@ namespace
 }
 
 
+int batch_mode(int argc, char* argv[]) {
+    if (argc != 3) {
+        std::cout << "Invalid input. Correct: lickey_gen.exe {file} {expire_date:YYYYMMDD format}\n";
+        return -1;
+    }
 
-int main(int argc, char* argv[])
+    const auto* fileName = argv[1];
+    const auto* expireDateStr = argv[2];
+    const std::filesystem::path inputFile{ fileName };
+
+    std::ifstream ifs{ fileName };
+    if (ifs.bad()) {
+        std::cerr << "Fail to read file: " << fileName << "\n";
+        return -1;
+    }
+    using namespace rapidjson;
+    rapidjson::Document d{};
+    const auto data = std::string((std::istreambuf_iterator<char>(ifs)),
+        std::istreambuf_iterator<char>());
+    d.Parse(data.c_str());
+    if (d.HasParseError()) {
+        std::cerr << "Fail to parse file: " << fileName << "\n";
+        return -1;
+    }
+
+    Date issueDate;
+    SetToday(issueDate);
+    Date expireDate;
+    if (!Load(expireDate, expireDateStr))
+    {
+        std::cerr << "invalid date format: " << expireDateStr << "\n";
+        return -1;
+    }
+
+    const auto* mac = d["mac"].GetString();
+ 
+    const auto* venderName = d["vender_name"].GetString();
+    const auto* appName = d["app_name"].GetString();
+    LicenseManager licMgr(venderName, appName);
+    License lic;
+    for (const auto& feat: d["features"].GetArray()) {
+        const auto* name = feat["name"].GetString();
+        const auto* version = feat["version"].GetString();
+        const auto numLics = feat["num_lics"].GetInt();
+        if (!AddFeature(name, version, issueDate, expireDateStr, numLics, lic, licMgr)) {
+            std::cerr << "Fail to add feature name=" << name << ", version=" << version << ", num_lics=" << numLics << "\n";
+            return -1;
+        }
+    }
+
+    const auto outFile = std::format("output\\{}.{}.{}.lic", inputFile.stem().string(), mac, expireDateStr);
+
+    if (!licMgr.Save(outFile, lickey::HardwareKey{ mac }, lic)) {
+        std::cerr << "Fail to write to file: " << outFile << "\n";
+        return -1;
+    }
+
+
+    return 0;
+}
+
+
+int interactive_mode(int argc, char* argv[])
 {
     std::cout << "License generator V" << VERSION() << "\n";
     std::cout << "(half-width characters only / without space and tabspace)\n";
@@ -177,3 +244,7 @@ int main(int argc, char* argv[])
     return 0;
 }
 
+int main(int argc, char* argv[])
+{
+    return batch_mode(argc, argv);
+}

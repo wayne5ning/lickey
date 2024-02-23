@@ -106,6 +106,7 @@
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>..\third_party\openssl-1.0.2l\$(PlatformName)\include;$(BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -142,6 +143,7 @@
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>..\third_party\openssl-1.0.2l\$(PlatformName)\include;$(BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
