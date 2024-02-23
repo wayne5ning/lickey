@@ -1,0 +1,18 @@
+{
+  "mac": "00-0C-29-80-3C-B4",
+  "ip": "10.31.41.93",
+  "vender_name": "wuqi",
+  "app_name":  "StockApp",
+  "features": [
+    {
+      "name": "base",
+      "version": "2.9.0",
+      "num_lics": 1
+    },
+    {
+      "name": "svc_quant360",
+      "version": "0.15.7.4",
+      "num_lics": 1
+    }
+  ]
+}
