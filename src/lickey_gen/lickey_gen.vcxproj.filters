@@ -7,10 +7,21 @@
     <Filter Include="Source Files">
       <UniqueIdentifier>{5f11dbc7-6fb7-4d0d-b467-b3bb81f5681a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="input">
+      <UniqueIdentifier>{59902d8d-7851-4e93-83fd-6fe665455988}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="input\xcsh.json">
+      <Filter>input</Filter>
+    </None>
+    <None Include="input\devpc.json">
+      <Filter>input</Filter>
+    </None>
   </ItemGroup>
 </Project>
