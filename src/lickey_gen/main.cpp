@@ -110,8 +110,11 @@ int batch_mode(int argc, char* argv[]) {
             return -1;
         }
     }
-
-    const auto outFile = std::format("output\\{}.{}.{}.lic", inputFile.stem().string(), mac, expireDateStr);
+    const auto outDir = std::filesystem::path{ "output" } / venderName / appName;
+    if (std::error_code ec; !std::filesystem::exists(outDir, ec)) {
+      std::filesystem::create_directories(outDir, ec);
+    }
+    const auto outFile = std::format("{}\\{}.{}.{}.lic", outDir.string(), inputFile.stem().string(), mac, expireDateStr);
 
     if (!licMgr.Save(outFile, lickey::HardwareKey{ mac }, lic)) {
         std::cerr << "Fail to write to file: " << outFile << "\n";
